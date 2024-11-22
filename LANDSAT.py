@@ -90,7 +90,7 @@ def get_each_image(collection, start_year: int, end_year: int, export_name='LAND
     """Downloads each image taken over the desired years to user's Google Drive. Includes end_year.
     Do not pre-filter the collection by date."""
 
-    start = str(start_year) + '-06-01'
+    start = str(start_year) + '-01-01'
     start = ee.Date(start)
     end = str(end_year) + '-12-31'
 
