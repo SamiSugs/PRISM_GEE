@@ -45,7 +45,7 @@ def clipToShape(map, shape) -> type(map):
     """Clip either an Image or an ImageCollection to a shape."""
     if type(map) is ee.image.Image:
         return map.clip(shape)
-    else type(map) is ee.imagecollection.ImageCollection:
+    elif type(map) is ee.imagecollection.ImageCollection:
         return map.map(lambda img: img.clip(shape))
 
 
