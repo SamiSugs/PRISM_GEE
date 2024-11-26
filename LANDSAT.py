@@ -11,7 +11,9 @@ def initialize(proj_name: str) -> None:
         ee.Authenticate()
         ee.Initialize(project=proj_name)
 
-def export_image(img: ee.image.Image, description: str, export_name: str, scale=None, crs='EPSG:4326', crsTransform=None) -> None:
+def export_image(
+    img: ee.image.Image, description: str, export_name: str, region,
+    scale=None, crs='EPSG:4326', crsTransform=None) -> None:
     """Export an Earth Engine image to an asset."""
 
     task_args = {
@@ -20,7 +22,7 @@ def export_image(img: ee.image.Image, description: str, export_name: str, scale=
         'fileNamePrefix': export_name,
         'crs': crs,
         'maxPixels': 4e12,
-        'region': pan_box
+        'region': region
     }
 
     if scale is not None:
@@ -56,6 +58,8 @@ initialize(usermap)
 # Panama Shape
 pan_shape = ee.FeatureCollection('FAO/GAUL/2015/level0').filter(ee.Filter.eq('ADM0_NAME', 'Panama')) # Uses FAO Country shapes from GEE
 pan_box = ee.Geometry.BBox(-83.055, 7.2, -77.15, 9.7) # Coordinates taken and adjusted from https://gist.github.com/graydon/11198540
+new_shape = ee.FeatureCollection("projects/ee-samisugiarta/assets/IBAs_BParita")
+new_shape_box = ee.Geometry.BBox(-80.5869, 7.884625, -80.23508, 8.368974)
 
 # LANDSAT  red green near-IR bands
 LANDSAT = ee.ImageCollection('LANDSAT/LE07/C02/T1_RT').select('B1', 'B2', 'B3', 'B4') # https://developers.google.com/earth-engine/datasets/catalog/LANDSAT_LE07_C02_T1_RT
@@ -82,21 +86,23 @@ def get_maps_yearly_mean(collection, start_year: int, end_year: int, step=1, exp
         start = year + '-01-01'
         end = year + '-12-31'
         LANDSAT_year_img = panLANDSAT.filterDate(start, end).reduce(ee.Reducer.mean())
+        
         export_image(LANDSAT_year_img, 'ExportLANDSAT' + year,
             export_name + year, 30, 'EPSG:4326')
 
 
-def get_each_image(collection, start_year: int, end_year: int, export_name='LANDSAT') -> None:
-    """Downloads each image taken over the desired years to user's Google Drive. Includes end_year.
-    Do not pre-filter the collection by date."""
+def get_maps_monthly_mean(collection, year: int, num_years: int, region, export_name='LANDSAT') -> None:
+    """Downloads a map of the mean monthly values for the desired year(s) to user's Google Drive.
+    Note: to download the map for a single year, set start_year and end_year to the desired year"""
 
-    start = str(start_year) + '-01-01'
-    start = ee.Date(start)
-    end = str(end_year) + '-12-31'
-
-    while start.format().getInfo() < end:
-        img = collection.filterDate(start, '2030-01-01').first()
-        date_of_img = img.date()
-        date = date_of_img.format('YYYYMMdd').getInfo()
-        export_image(img, 'ExportLANDSAT', export_name + date, 30)
-        start = date_of_img.advance(1, 'day')
+    start = ee.Date(str(year) + '-01-01')
+    end = ee.Date(str(year) + '-01-31')
+    
+    for i in range(12 * num_years):
+        LANDSAT_year_img = collection.filterDate(start, end).reduce(ee.Reducer.mean())
+        
+        export_image(LANDSAT_year_img, 'ExportLANDSAT' + start.format('MMMYYYY').getInfo(),
+            export_name + start.format('MMMYYYY').getInfo(), region, 30, 'EPSG:4326')
+        
+        start = start.advance(1, 'month')
+        end = end.advance(1, 'month')
