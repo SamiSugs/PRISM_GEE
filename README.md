@@ -4,7 +4,7 @@ For PRSIM 2024, please note that the DEM included in these scripts is ***not*** 
 
 ## Running Scripts
 
-I had trouble installing the packages required to authenticate the Google account and run the scripts locally (could not figure it out in fact), so as a work around, you can run the script in Colab (Cloud compute notebook available with standard Google account). To do this, copy the code from the file and paste it in Colab.
+Running these scripts locally requires you to have Python installed, alongside a number of packages (details at <https://developers.google.com/earth-engine/guides/python_install>). Alternatively, you can run them in Colab (Cloud compute notebook available with standard Google account). If using Colab, you will need to copy/paste the code into the app and then follow the instruction provided here, as only .ipynb (Python notebook) files can be uploaded directly.
 
 Here is a non-technical guide to running each script.
 
@@ -14,38 +14,38 @@ Quick notes:
 
 -   Uncommenting a line of code means deleting the hash symbol and the space that follows that are at the beginning of the line. For example if the original line was:
 
-    \# export_image(coral, 'Coral Export', 'Coral', pan_box)
+    \# foo(x, y, z)
 
     Uncommenting it would mean leaving it as:
 
-    export_image(coral, 'Coral Export', 'Coral', pan_box)
+    foo(x, y, z)
 
--   When running one of these scripts, you will usually be prompted to authenticate the google account. Simply click 'yes' or 'continue' or similar and sign in if prompted. This step is skipped if the authentication is cached (i.e. you have authenticated recently).
+-   When running one of these scripts, unless you have run one recently, you will be prompted to authenticate the google account. Simply click 'yes' or 'continue' or similar and sign in if prompted. This step is skipped if the authentication is cached (i.e. you have authenticated recently). Make sure you sign in to the account associated with the GEE project you are using.
 
-### Coral:
+### Coral.py
 
 This file is small enough to download on the fly (\~12 seconds to download to Drive)
 
-1.  Once the script is in Colab and a valid project name is entered, uncomment the very last line of code and run the script.
+1.  Once a valid project name is entered, uncomment the very last line of code and run the script.
 2.  Authenticate if necessary.
     -   File will be called Coral.tif
 
-### Mangrove:
+### Mangrove.py
 
 This file is small enough to download on the fly (\~11 seconds to download to Drive)
 
-1.  Once the script is in Colab and a valid project name is entered, uncomment the very last line of code and run the script.
+1.  Once a valid project name is entered, uncomment the very last line of code and run the script.
 2.  Authenticate if necessary.
     -   File will be called PanamaMangroves.csv
 
-### Monthly LANDSAT Average:
+### MonthlyLandsatAverage.py
 
 These files would be very impractical and slow to download on the fly
 
 -   This script will download multiple files, each one representing the average LANDSAT for one month in the desired range.
 -   The script returns all the months for the given calendar years. If you want Oct. 2020 - Jun. 2021, you will have to download all of 2020 and 2021 and choose the appropriate files once they have downloaded.
 
-1.  Once the script is in Colab and a valid project name is entered, fill in the values of 'args' (lines 80-84). ***Do not delete the commas.***
+1.  Once a valid project name is entered, fill in the values of 'args' (lines 80-84). ***Do not delete the commas.***
     -   'collection' is the specific LANDSAT collection that the files will download from. The file imports 5, 7, and 8. Choose which collection you want based on the dates you need and the dates for which each collection is available (I left the years available as comments above each). To fill in the value, write "LANDSAT5", "LANDSAT7", or "LANDSAT8", ***without the quotation marks.***
 
         -   If your desired range is covered by two collections, the newer one is likely best.
@@ -73,13 +73,13 @@ These files would be very impractical and slow to download on the fly
         -   e.g. the file containing information for February 2023 will be called export_nameFeb2023.tif
 3.  Authenticate if necessary.
 
-### Yearly LANDSAT NDVI Average
+### YearlyLandsatNDVIAverage.py
 
 These files would be very impractical and slow to download on the fly
 
 -   This script will download multiple files, each one representing the average LANDSAT for one year in the desired range.
 
-1.  Once the script is in Colab and a valid project name is entered, fill in the values of 'args' (lines 86-92). ***Do not delete the commas.***
+1.  Once a valid project name is entered, fill in the values of 'args' (lines 86-92). ***Do not delete the commas.***
     -   'collection' has the same function as above, but you may also choose NDVI in addition to the LANDSAT options from before. If choosing NDVI, please read the rest of the guide carefully.
 
     -   'year' is identical to the description above.
@@ -97,12 +97,12 @@ These files would be very impractical and slow to download on the fly
     -   The file names will be similar to above, but will not contain the month, only the year.
 3.  Authenticate if necessary.
 
-### Slope and DEM
+### SlopeAndDEM.py
 
 These files would not be practical to download on the fly. Downloads a 30m x 30m resolution.
 
-1.  Once the script is in Colab and a valid project name is entered, uncomment either line 59 for the DEM or line 62 for the slope (or both, if desired), and execute the code.
+1.  Once a valid project name is entered, uncomment either line 59 for the DEM or line 62 for the slope (or both, if desired), and execute the code.
 2.  Authenticate if necessary.
     -   File name will be DEM.tif for DEM, and Slope.tif for slope.
 
-Note: the slope is not a dataset that exists, it is computed using the DEM using a function in the gee package (ee.Terrain.products(DEM).select('slope')). See Google's documentation for more.
+Note: the slope is not a dataset that exists per se, it is computed using the DEM using a function in the gee package (ee.Terrain.products(DEM).select('slope')). See Google's documentation for more.
